@@ -66,5 +66,5 @@ Signals should only be used for global events that affect many objects simultane
 For instance, if the player needs to know when an enemy dies then it may be a good idea to use signals. 
 This way, the player doesn't have to subscribe to every single enemy's OnDeath event directly.
 
-However, if you want to know when the player's collider comes into collision with an object then it may be a better idea for your player to subscribe to its collider's event directly instead of broadcasting the collision it via the SignalBus.
+However, if you want to know when the player's collider comes into collision with an object then it may be a better idea for your player to subscribe to its collider's event directly instead of broadcasting the collision via the SignalBus.
 Unless other unrelated objects need to know about this of course.
