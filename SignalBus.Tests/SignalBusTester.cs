@@ -14,7 +14,7 @@ public class SignalBusTester
             var callback = Fixture.Create<Action<object>>();
 
             //Act
-            Action action = () => Instance.Subscribe(identifier, callback);
+            var action = () => Instance.Subscribe(identifier, callback);
 
             //Assert
             action.Should().Throw<ArgumentNullException>();
@@ -28,7 +28,7 @@ public class SignalBusTester
             Action<object> callback = null;
 
             //Act
-            Action action = () => Instance.Subscribe(identifier, callback);
+            var action = () => Instance.Subscribe(identifier, callback);
 
             //Assert
             action.Should().Throw<ArgumentNullException>();
@@ -61,7 +61,7 @@ public class SignalBusTester
             object identifier = null;
 
             //Act
-            Action action = () => Instance.Trigger(identifier);
+            var action = () => Instance.Trigger(identifier);
 
             //Assert
             action.Should().Throw<ArgumentNullException>();
@@ -74,7 +74,7 @@ public class SignalBusTester
             var identifier = Fixture.Create<object>();
 
             //Act
-            Action action = () => Instance.Trigger(identifier);
+            var action = () => Instance.Trigger(identifier);
 
             //Assert
             action.Should().NotThrow();
@@ -95,7 +95,7 @@ public class SignalBusTester
             Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
 
             //Act
-            Action action = () => Instance.Trigger(identifier);
+            var action = () => Instance.Trigger(identifier);
 
             //Assert
             action.Should().NotThrow();
@@ -174,7 +174,7 @@ public class SignalBusTester
             var args = Fixture.Create<Dummy>();
 
             //Act
-            Action action = () => Instance.Trigger(identifier, args);
+            var action = () => Instance.Trigger(identifier, args);
 
             //Assert
             action.Should().Throw<ArgumentNullException>();
@@ -188,7 +188,7 @@ public class SignalBusTester
             var args = Fixture.Create<Dummy>();
 
             //Act
-            Action action = () => Instance.Trigger(identifier, args);
+            var action = () => Instance.Trigger(identifier, args);
 
             //Assert
             action.Should().NotThrow();
@@ -211,7 +211,7 @@ public class SignalBusTester
             Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
 
             //Act
-            Action action = () => Instance.Trigger(identifier, args);
+            var action = () => Instance.Trigger(identifier, args);
 
             //Assert
             action.Should().NotThrow();
@@ -397,7 +397,7 @@ public class SignalBusTester
             object identifier = null;
 
             //Act
-            Action action = () => Instance.Clear(identifier);
+            var action = () => Instance.Clear(identifier);
 
             //Assert
             action.Should().Throw<ArgumentNullException>();
@@ -509,7 +509,7 @@ public class SignalBusTester
             var callback = Fixture.Create<Action<object>>();
 
             //Act
-            Action action = () => Instance.Unsubscribe(identifier, callback);
+            var action = () => Instance.Unsubscribe(identifier, callback);
 
             //Assert
             action.Should().Throw<ArgumentNullException>();
@@ -523,7 +523,7 @@ public class SignalBusTester
             Action<object> callback = null;
 
             //Act
-            Action action = () => Instance.Unsubscribe(identifier, callback);
+            var action = () => Instance.Unsubscribe(identifier, callback);
 
             //Assert
             action.Should().Throw<ArgumentNullException>();
@@ -537,7 +537,7 @@ public class SignalBusTester
             var callback = Fixture.Create<Action<object>>();
 
             //Act
-            Action action = () => Instance.Unsubscribe(identifier, callback);
+            var action = () => Instance.Unsubscribe(identifier, callback);
 
             //Assert
             action.Should().NotThrow();
@@ -554,7 +554,7 @@ public class SignalBusTester
             Instance.Subscribe(identifier, someOtherCallback);
 
             //Act
-            Action action = () => Instance.Unsubscribe(identifier, callback);
+            var action = () => Instance.Unsubscribe(identifier, callback);
 
             //Assert
             action.Should().NotThrow();
