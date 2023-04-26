@@ -10,7 +10,7 @@ public interface ISignalBus
     /// <summary>
     /// Subscribes an action to execute once the identifier is triggered.
     /// </summary>
-    void Subscribe(object identifier, Action<object> callback);
+    void Subscribe(object identifier, Action<object?> callback);
 
     /// <summary>
     /// Triggers a signal for all listeners without parameters.
@@ -35,7 +35,7 @@ public interface ISignalBus
     /// <summary>
     /// Removes a callback action for the specified identifier.
     /// </summary>
-    void Unsubscribe(object identifier, Action<object> callback);
+    void Unsubscribe(object identifier, Action<object?> callback);
 
     /// <summary>
     /// Returns whether or not there is anything listening to the specified identifier.
@@ -45,19 +45,19 @@ public interface ISignalBus
     /// <summary>
     /// Returns whether or not a callback action is listening for the specified identifier.
     /// </summary>
-    bool IsSubscribed(object identifier, Action<object> callback);
+    bool IsSubscribed(object identifier, Action<object?> callback);
 }
 
 /// <inheritdoc cref="ISignalBus"/>
 [AutoInject(Lifetime = ServiceLifetime.Scoped)]
 public class SignalBus : ISignalBus
 {
-    private readonly IDictionary<object, IList<Action<object>>> _subscriptions = new Dictionary<object, IList<Action<object>>>();
+    private readonly IDictionary<object, IList<Action<object?>>> _subscriptions = new Dictionary<object, IList<Action<object?>>>();
 
     private bool _isExecuting;
     private readonly IList<Action> _deferredActions = new List<Action>();
 
-    public void Subscribe(object identifier, Action<object> callback)
+    public void Subscribe(object identifier, Action<object?> callback)
     {
         if (identifier == null) throw new ArgumentNullException(nameof(identifier));
         if (callback == null) throw new ArgumentNullException(nameof(callback));
@@ -68,10 +68,10 @@ public class SignalBus : ISignalBus
             SubscribeInternal(identifier, callback);
     }
 
-    private void SubscribeInternal(object identifier, Action<object> callback)
+    private void SubscribeInternal(object identifier, Action<object?> callback)
     {
         if (!IsSubscribed(identifier))
-            _subscriptions[identifier] = new List<Action<object>>();
+            _subscriptions[identifier] = new List<Action<object?>>();
 
         _subscriptions[identifier].Add(callback);
     }
@@ -119,7 +119,7 @@ public class SignalBus : ISignalBus
         }
     }
 
-    public void Unsubscribe(object identifier, Action<object> callback)
+    public void Unsubscribe(object identifier, Action<object?> callback)
     {
         if (identifier == null) throw new ArgumentNullException(nameof(identifier));
         if (callback == null) throw new ArgumentNullException(nameof(callback));
@@ -130,7 +130,7 @@ public class SignalBus : ISignalBus
             UnsubscribeInternal(identifier, callback);
     }
 
-    private void UnsubscribeInternal(object identifier, Action<object> callback)
+    private void UnsubscribeInternal(object identifier, Action<object?> callback)
     {
         if (!IsSubscribed(identifier, callback)) return;
         var hashset = _subscriptions[identifier];
@@ -144,5 +144,5 @@ public class SignalBus : ISignalBus
 
     public bool IsSubscribed(object identifier) => _subscriptions.ContainsKey(identifier ?? throw new ArgumentNullException(nameof(identifier)));
 
-    public bool IsSubscribed(object identifier, Action<object> callback) => IsSubscribed(identifier) && _subscriptions[identifier].Contains(callback ?? throw new ArgumentNullException(nameof(callback)));
+    public bool IsSubscribed(object identifier, Action<object?> callback) => IsSubscribed(identifier) && _subscriptions[identifier].Contains(callback ?? throw new ArgumentNullException(nameof(callback)));
 }

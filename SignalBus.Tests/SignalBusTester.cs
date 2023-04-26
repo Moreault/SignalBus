@@ -11,7 +11,7 @@ public class SignalBusTester
         {
             //Arrange
             object identifier = null!;
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
 
             //Act
             var action = () => Instance.Subscribe(identifier, callback);
@@ -25,7 +25,7 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            Action<object> callback = null;
+            Action<object?> callback = null!;
 
             //Act
             var action = () => Instance.Subscribe(identifier, callback);
@@ -40,7 +40,7 @@ public class SignalBusTester
             //Arrange
             var identifier = Fixture.Create<object>();
             var i = 0;
-            Action<object> callback = _ => i++;
+            Action<object?> callback = _ => i++;
 
             //Act
             Instance.Subscribe(identifier, callback);
@@ -58,7 +58,7 @@ public class SignalBusTester
         public void WhenIdentifierNull_Throw()
         {
             //Arrange
-            object identifier = null;
+            object identifier = null!;
 
             //Act
             var action = () => Instance.Trigger(identifier);
@@ -85,14 +85,14 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            Action<object> callback = _ =>
+            Action<object?> callback = _ =>
             {
-                var someCallback = Fixture.Create<Action<object>>();
+                var someCallback = Fixture.Create<Action<object?>>();
                 Instance.Subscribe(identifier, someCallback);
             };
             Instance.Subscribe(identifier, callback);
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
 
             //Act
             var action = () => Instance.Trigger(identifier);
@@ -108,13 +108,13 @@ public class SignalBusTester
             var identifier = Fixture.Create<object>();
 
             var wasInvoked = false;
-            Action<object> callback = _ =>
+            Action<object?> callback = _ =>
             {
                 Instance.Subscribe(identifier, _ => wasInvoked = true);
             };
             Instance.Subscribe(identifier, callback);
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
 
             //Act
             Instance.Trigger(identifier);
@@ -130,13 +130,13 @@ public class SignalBusTester
             var identifier = Fixture.Create<object>();
 
             var invokeCount = 0;
-            Action<object> callback = _ =>
+            Action<object?> callback = _ =>
             {
                 Instance.Subscribe(identifier, _ => invokeCount++);
             };
             Instance.Subscribe(identifier, callback);
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
 
             //Act
             Instance.Trigger(identifier);
@@ -152,7 +152,7 @@ public class SignalBusTester
             //Arrange
             var identifier = Fixture.Create<object>();
             var invokeCount = 0;
-            Action<object> callback = _ => invokeCount++;
+            Action<object?> callback = _ => invokeCount++;
             Instance.Subscribe(identifier, callback);
 
             //Act
@@ -170,7 +170,7 @@ public class SignalBusTester
         public void WhenIdentifierNull_Throw()
         {
             //Arrange
-            object identifier = null;
+            object identifier = null!;
             var args = Fixture.Create<Dummy>();
 
             //Act
@@ -201,14 +201,14 @@ public class SignalBusTester
             var identifier = Fixture.Create<object>();
             var args = Fixture.Create<Dummy>();
 
-            Action<object> callback = _ =>
+            Action<object?> callback = _ =>
             {
-                var someCallback = Fixture.Create<Action<object>>();
+                var someCallback = Fixture.Create<Action<object?>>();
                 Instance.Subscribe(identifier, someCallback);
             };
             Instance.Subscribe(identifier, callback);
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
 
             //Act
             var action = () => Instance.Trigger(identifier, args);
@@ -225,13 +225,13 @@ public class SignalBusTester
             var args = Fixture.Create<Dummy>();
 
             var wasInvoked = false;
-            Action<object> callback = _ =>
+            Action<object?> callback = _ =>
             {
                 Instance.Subscribe(identifier, _ => wasInvoked = true);
             };
             Instance.Subscribe(identifier, callback);
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
 
             //Act
             Instance.Trigger(identifier, args);
@@ -248,13 +248,13 @@ public class SignalBusTester
             var args = Fixture.Create<Dummy>();
 
             var invokeCount = 0;
-            Action<object> callback = _ =>
+            Action<object?> callback = _ =>
             {
                 Instance.Subscribe(identifier, _ => invokeCount++);
             };
             Instance.Subscribe(identifier, callback);
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier, Fixture.Create<Action<object?>>());
 
             //Act
             Instance.Trigger(identifier, args);
@@ -272,11 +272,11 @@ public class SignalBusTester
             var args = Fixture.Create<Dummy>();
 
             var invokeCount = 0;
-            object invokedArgs = null;
-            Action<object> callback = args =>
+            object invokedArgs = null!;
+            Action<object?> callback = x =>
             {
                 invokeCount++;
-                invokedArgs = args;
+                invokedArgs = x!;
             };
             Instance.Subscribe(identifier, callback);
 
@@ -297,17 +297,17 @@ public class SignalBusTester
         {
             //Arrange
             var identifier1 = Fixture.Create<object>();
-            Instance.Subscribe(identifier1, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier1, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier1, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier1, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier1, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier1, Fixture.Create<Action<object?>>());
             var identifier2 = Fixture.Create<object>();
-            Instance.Subscribe(identifier2, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier2, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier2, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier2, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier2, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier2, Fixture.Create<Action<object?>>());
             var identifier3 = Fixture.Create<object>();
-            Instance.Subscribe(identifier3, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier3, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier3, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier3, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier3, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier3, Fixture.Create<Action<object?>>());
 
             //Act
             Instance.Clear();
@@ -325,9 +325,9 @@ public class SignalBusTester
             var identifier1 = Fixture.Create<object>();
 
             var invokeCount = 0;
-            Action<object> callback = _ => invokeCount++;
+            Action<object?> callback = _ => invokeCount++;
 
-            Action<object> clearingCallback = _ =>
+            Action<object?> clearingCallback = _ =>
             {
                 invokeCount++;
                 Instance.Clear();
@@ -358,9 +358,9 @@ public class SignalBusTester
             //Arrange
             var identifier1 = Fixture.Create<object>();
 
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
 
-            Action<object> clearingCallback = _ =>
+            Action<object?> clearingCallback = _ =>
             {
                 Instance.Clear();
             };
@@ -394,7 +394,7 @@ public class SignalBusTester
         public void WhenIdentifierNull_Throw()
         {
             //Arrange
-            object identifier = null;
+            object identifier = null!;
 
             //Act
             var action = () => Instance.Clear(identifier);
@@ -408,17 +408,17 @@ public class SignalBusTester
         {
             //Arrange
             var identifier1 = Fixture.Create<object>();
-            Instance.Subscribe(identifier1, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier1, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier1, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier1, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier1, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier1, Fixture.Create<Action<object?>>());
             var identifier2 = Fixture.Create<object>();
-            Instance.Subscribe(identifier2, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier2, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier2, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier2, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier2, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier2, Fixture.Create<Action<object?>>());
             var identifier3 = Fixture.Create<object>();
-            Instance.Subscribe(identifier3, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier3, Fixture.Create<Action<object>>());
-            Instance.Subscribe(identifier3, Fixture.Create<Action<object>>());
+            Instance.Subscribe(identifier3, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier3, Fixture.Create<Action<object?>>());
+            Instance.Subscribe(identifier3, Fixture.Create<Action<object?>>());
 
             //Act
             Instance.Clear(identifier1);
@@ -436,9 +436,9 @@ public class SignalBusTester
             var identifier1 = Fixture.Create<object>();
 
             var invokeCount = 0;
-            Action<object> callback = _ => invokeCount++;
+            Action<object?> callback = _ => invokeCount++;
 
-            Action<object> clearingCallback = _ =>
+            Action<object?> clearingCallback = _ =>
             {
                 invokeCount++;
                 Instance.Clear(identifier1);
@@ -469,9 +469,9 @@ public class SignalBusTester
             //Arrange
             var identifier1 = Fixture.Create<object>();
 
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
 
-            Action<object> clearingCallback = _ =>
+            Action<object?> clearingCallback = _ =>
             {
                 Instance.Clear(identifier1);
             };
@@ -505,8 +505,8 @@ public class SignalBusTester
         public void WhenIdentifierIsNull_Throw()
         {
             //Arrange
-            object identifier = null;
-            var callback = Fixture.Create<Action<object>>();
+            object identifier = null!;
+            var callback = Fixture.Create<Action<object?>>();
 
             //Act
             var action = () => Instance.Unsubscribe(identifier, callback);
@@ -520,7 +520,7 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            Action<object> callback = null;
+            Action<object?> callback = null!;
 
             //Act
             var action = () => Instance.Unsubscribe(identifier, callback);
@@ -534,7 +534,7 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
 
             //Act
             var action = () => Instance.Unsubscribe(identifier, callback);
@@ -548,9 +548,9 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
 
-            var someOtherCallback = Fixture.Create<Action<object>>();
+            var someOtherCallback = Fixture.Create<Action<object?>>();
             Instance.Subscribe(identifier, someOtherCallback);
 
             //Act
@@ -565,9 +565,9 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
 
-            var someOtherCallback = Fixture.Create<Action<object>>();
+            var someOtherCallback = Fixture.Create<Action<object?>>();
             Instance.Subscribe(identifier, someOtherCallback);
 
             //Act
@@ -582,9 +582,9 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
 
-            var someOtherCallback = Fixture.Create<Action<object>>();
+            var someOtherCallback = Fixture.Create<Action<object?>>();
             Instance.Subscribe(identifier, callback);
             Instance.Subscribe(identifier, someOtherCallback);
 
@@ -600,9 +600,9 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
 
-            var someOtherCallback = Fixture.Create<Action<object>>();
+            var someOtherCallback = Fixture.Create<Action<object?>>();
             Instance.Subscribe(identifier, callback);
             Instance.Subscribe(identifier, someOtherCallback);
 
@@ -621,7 +621,7 @@ public class SignalBusTester
         public void WhenIdentifierIsNull_Throw()
         {
             //Arrange
-            object identifier = null;
+            object identifier = null!;
 
             //Act
             Action action = () => Instance.IsSubscribed(identifier);
@@ -635,7 +635,7 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
             Instance.Subscribe(identifier, callback);
 
             //Act
@@ -666,8 +666,8 @@ public class SignalBusTester
         public void WhenIdentifierIsNull_Throw()
         {
             //Arrange
-            object identifier = null;
-            var callback = Fixture.Create<Action<object>>();
+            object identifier = null!;
+            var callback = Fixture.Create<Action<object?>>();
 
             //Act
             Action action = () => Instance.IsSubscribed(identifier, callback);
@@ -681,9 +681,9 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            Action<object> callback = null;
+            Action<object?> callback = null!;
 
-            var someOtherCallback = Fixture.Create<Action<object>>();
+            var someOtherCallback = Fixture.Create<Action<object?>>();
             Instance.Subscribe(identifier, someOtherCallback);
 
             //Act
@@ -698,7 +698,7 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
             Instance.Subscribe(identifier, callback);
 
             //Act
@@ -714,7 +714,7 @@ public class SignalBusTester
             //Arrange
             var identifier = Fixture.Create<object>();
             var otherIdentifier = Fixture.Create<object>();
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
             Instance.Subscribe(otherIdentifier, callback);
 
             //Act
@@ -729,7 +729,7 @@ public class SignalBusTester
         {
             //Arrange
             var identifier = Fixture.Create<object>();
-            var callback = Fixture.Create<Action<object>>();
+            var callback = Fixture.Create<Action<object?>>();
 
             //Act
             var result = Instance.IsSubscribed(identifier, callback);
