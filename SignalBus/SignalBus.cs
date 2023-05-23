@@ -11,7 +11,7 @@ public interface ISignalBus
     void Subscribe(object identifier, Action<object?> callback);
 
     /// <summary>
-    /// Subscribes an action to execute once the identifier is triggered and also instantly triggers for every time that the event was triggered before subscribing.
+    /// Subscribes an action to execute once the identifier is triggered and also instantly triggers if it was triggered at least once before subscribing.
     /// </summary>
     void SubscribeRetroactively(object identifier, Action<object?> callback);
 
@@ -59,7 +59,7 @@ public class SignalBus : ISignalBus
 
     private bool _isExecuting;
     private readonly List<Action> _deferredActions = new();
-    private readonly List<TriggeredSignal> _triggeredSignals = new();
+    private readonly Dictionary<object, object?> _triggeredSignals = new();
 
     public void Subscribe(object identifier, Action<object?> callback)
     {
@@ -76,8 +76,8 @@ public class SignalBus : ISignalBus
     {
         Subscribe(identifier, callback);
 
-        foreach (var triggered in _triggeredSignals)
-            Trigger(triggered.Identifier, triggered.Arguments);
+        if (_triggeredSignals.TryGetValue(identifier, out var args))
+            callback.Invoke(args);
     }
 
     private void SubscribeInternal(object identifier, Action<object?> callback)
@@ -104,11 +104,7 @@ public class SignalBus : ISignalBus
             action.Invoke();
         _deferredActions.Clear();
 
-        _triggeredSignals.Add(new TriggeredSignal
-        {
-            Identifier = identifier,
-            Arguments = args
-        });
+        _triggeredSignals[identifier] = args;
     }
 
     public void Clear()
