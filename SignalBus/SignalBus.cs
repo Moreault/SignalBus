@@ -11,6 +11,11 @@ public interface ISignalBus
     void Subscribe(object identifier, Action<object?> callback);
 
     /// <summary>
+    /// Subscribes an action to execute once the identifier is triggered and also instantly triggers for every time that the event was triggered before subscribing.
+    /// </summary>
+    void SubscribeRetroactively(object identifier, Action<object?> callback);
+
+    /// <summary>
     /// Triggers a signal for all listeners without parameters.
     /// </summary>
     void Trigger(object identifier);
@@ -53,7 +58,8 @@ public class SignalBus : ISignalBus
     private readonly IDictionary<object, IList<Action<object?>>> _subscriptions = new Dictionary<object, IList<Action<object?>>>();
 
     private bool _isExecuting;
-    private readonly IList<Action> _deferredActions = new List<Action>();
+    private readonly List<Action> _deferredActions = new();
+    private readonly List<TriggeredSignal> _triggeredSignals = new();
 
     public void Subscribe(object identifier, Action<object?> callback)
     {
@@ -64,6 +70,14 @@ public class SignalBus : ISignalBus
             _deferredActions.Add(() => SubscribeInternal(identifier, callback));
         else
             SubscribeInternal(identifier, callback);
+    }
+
+    public void SubscribeRetroactively(object identifier, Action<object?> callback)
+    {
+        Subscribe(identifier, callback);
+
+        foreach (var triggered in _triggeredSignals)
+            Trigger(triggered.Identifier, triggered.Arguments);
     }
 
     private void SubscribeInternal(object identifier, Action<object?> callback)
@@ -89,6 +103,12 @@ public class SignalBus : ISignalBus
         foreach (var action in _deferredActions)
             action.Invoke();
         _deferredActions.Clear();
+
+        _triggeredSignals.Add(new TriggeredSignal
+        {
+            Identifier = identifier,
+            Arguments = args
+        });
     }
 
     public void Clear()
@@ -97,6 +117,8 @@ public class SignalBus : ISignalBus
             _deferredActions.Add(() => _subscriptions.Clear());
         else
             _subscriptions.Clear();
+
+        _triggeredSignals.Clear();
     }
 
     public void Clear(object identifier)
