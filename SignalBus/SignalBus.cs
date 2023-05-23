@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace ToolBX.SignalBus;
+﻿namespace ToolBX.SignalBus;
 
 /// <summary>
 /// Emits signals that can be received by any listener.
