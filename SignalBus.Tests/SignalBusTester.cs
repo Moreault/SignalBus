@@ -52,6 +52,75 @@ public class SignalBusTester
     }
 
     [TestClass]
+    public class SubscribeRetroactively : Tester<SignalBus>
+    {
+        [TestMethod]
+        public void WhenIdentifierNull_Throw()
+        {
+            //Arrange
+            object identifier = null!;
+            var callback = Fixture.Create<Action<object?>>();
+
+            //Act
+            var action = () => Instance.SubscribeRetroactively(identifier, callback);
+
+            //Assert
+            action.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void WhenCallbackNull_Throw()
+        {
+            //Arrange
+            var identifier = Fixture.Create<object>();
+            Action<object?> callback = null!;
+
+            //Act
+            var action = () => Instance.SubscribeRetroactively(identifier, callback);
+
+            //Assert
+            action.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void Always_Subscribe()
+        {
+            //Arrange
+            var identifier = Fixture.Create<object>();
+            var i = 0;
+            Action<object?> callback = _ => i++;
+
+            //Act
+            Instance.SubscribeRetroactively(identifier, callback);
+
+            //Assert
+            Instance.Trigger(identifier);
+            i.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void WhenSignalTriggeredBeforeSubscribing_TriggerForCallerOnly()
+        {
+            //Arrange
+            var identifier = Fixture.Create<object>();
+
+            var i = 0;
+            var y = 0;
+
+            Instance.Trigger(identifier);
+
+            Instance.Subscribe(identifier, _ => y++);
+            
+            //Act
+            Instance.SubscribeRetroactively(identifier, _ => i++);
+
+            //Assert
+            i.Should().Be(1);
+            y.Should().Be(0);
+        }
+    }
+
+    [TestClass]
     public class Trigger : Tester<SignalBus>
     {
         [TestMethod]

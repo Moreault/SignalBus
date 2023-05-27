@@ -57,6 +57,11 @@ Add the following line when adding services.
 services.AddSignalBus();
 ```
 
+## Subscribing
+There are two ways to subscribe to events : `Subscribe` and `SubscribeRetroactively`.
+
+`Subscribe` works like you would expect. The subscribing callback will be called when an object triggers the signal. `SubscribeRetroactively` does the same thing but will trigger right away if the signal was already triggered when it subscribed. It may not apply to every use case but it's useful when you want to avoid time dependencies. 
+
 ## Important
 This may seem like a great idea to apply everywhere but I strongly advise against it. 
 There are times when using signals is cleaner than the alternative but other times when you should prioritize localized events.

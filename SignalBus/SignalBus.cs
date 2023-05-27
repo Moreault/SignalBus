@@ -93,6 +93,7 @@ public class SignalBus : ISignalBus
     public void Trigger<TArgs>(object identifier, TArgs? args)
     {
         if (identifier == null) throw new ArgumentNullException(nameof(identifier));
+        _triggeredSignals[identifier] = args;
         if (!IsSubscribed(identifier)) return;
 
         _isExecuting = true;
@@ -103,8 +104,6 @@ public class SignalBus : ISignalBus
         foreach (var action in _deferredActions)
             action.Invoke();
         _deferredActions.Clear();
-
-        _triggeredSignals[identifier] = args;
     }
 
     public void Clear()
