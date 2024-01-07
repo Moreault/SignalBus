@@ -2,8 +2,8 @@
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddSignalBus(this IServiceCollection services)
+    public static IServiceCollection AddSignalBus(this IServiceCollection services, AutoInjectOptions? options = null)
     {
-        return services.AddScoped<ISignalBus, SignalBus>();
+        return services.AddAutoInjectServices(Assembly.GetExecutingAssembly(), options);
     }
 }
