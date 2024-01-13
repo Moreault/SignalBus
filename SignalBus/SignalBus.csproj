@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ToolBX.AutoInject" Version="2.2.0-beta7" />
+		<PackageReference Include="ToolBX.AutoInject" Version="2.2.0" />
 	</ItemGroup>
 
 </Project>
