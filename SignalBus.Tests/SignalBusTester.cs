@@ -643,7 +643,7 @@ public class SignalBusTester
             Instance.Unsubscribe(identifier, callback);
 
             //Assert
-            Instance.IsSubscribed(identifier);
+            Instance.IsSubscribed(identifier).Should().BeTrue();
         }
 
         [TestMethod]
