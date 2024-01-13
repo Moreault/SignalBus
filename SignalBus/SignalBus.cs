@@ -52,7 +52,7 @@ public interface ISignalBus
 }
 
 /// <inheritdoc cref="ISignalBus"/>
-[AutoInject(Lifetime = ServiceLifetime.Scoped)]
+[AutoInject(ServiceLifetime.Scoped)]
 public class SignalBus : ISignalBus
 {
     private readonly IDictionary<object, IList<Action<object?>>> _subscriptions = new Dictionary<object, IList<Action<object?>>>();
