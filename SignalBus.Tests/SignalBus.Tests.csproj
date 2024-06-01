@@ -1,26 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-	  <IsPackable>false</IsPackable>
-	  <RootNamespace>ToolBX.$(AssemblyName)</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<RootNamespace>ToolBX.$(AssemblyName)</RootNamespace>
+	</PropertyGroup>
 
 	<ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.3.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.3.1" />
-    <PackageReference Include="coverlet.collector" Version="6.0.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="ToolBX.Eloquentest" Version="2.2.1" />
-  </ItemGroup>
+		<PackageReference Include="FluentAssertions" Version="6.12.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+		<PackageReference Include="MSTest.TestAdapter" Version="3.4.3" />
+		<PackageReference Include="MSTest.TestFramework" Version="3.4.3" />
+		<PackageReference Include="coverlet.collector" Version="6.0.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="WhiteJackalStudio.TestTools" Version="1.0.0-beta0b" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SignalBus\SignalBus.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SignalBus\SignalBus.csproj" />
+	</ItemGroup>
 
 </Project>
