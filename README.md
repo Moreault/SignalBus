@@ -25,16 +25,16 @@ public void SomeMethod()
 	_signalBus.Subscribe(Signal.Something, TheSomethingMethod)
 }
 
-public SomeOtherMethod()
+public void SomeOtherMethod()
 {
 	//This will trigger every action that has subscribed to the Signal.Something identifier with this argument
 	_signalBus.Trigger(Signal.Something, new ActualArgumentType { Name = "Henry", Level = 15, Job = Job.Warrior });
 }
 
-//You do need an object-typed args parameter even if you don't use arguments... I haven't found a better way to deal with this yet unfortunately
-private void TheSomethingMethod(object args)
+//The callback signature requires an object? parameter even if you don't use arguments
+private void TheSomethingMethod(object? args)
 {
-	var arguments = (ActualArgumentType)args;
+	var arguments = (ActualArgumentType)args!;
 
 	...
 }
@@ -42,16 +42,6 @@ private void TheSomethingMethod(object args)
 ```
 
 ### Setup
-
-#### With AutoInject
-
-If you already use AutoInject or AssemblyInitializer then you're already good to go.
-
-See the AutoInject repo for more information on how to set it up.
-
-#### Without AutoInject
-
-Add the following line when adding services.
 
 ```c#
 services.AddSignalBus();
@@ -73,3 +63,10 @@ This way, the player doesn't have to subscribe to every single enemy's OnDeath e
 
 However, if you want to know when the player's collider comes into collision with an object then it may be a better idea for your player to subscribe to its collider's event directly instead of broadcasting the collision via the SignalBus.
 Unless other unrelated objects need to know about this of course.
+
+## Breaking changes
+
+### 4.0.0
+- Now targets .NET 10
+- `ToolBX.AutoInject` is no longer a dependency of this library
+- The `AutoInjectOptions` parameter has been removed from `AddSignalBus()`

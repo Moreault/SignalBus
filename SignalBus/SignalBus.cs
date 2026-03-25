@@ -41,21 +41,20 @@ public interface ISignalBus
     void Unsubscribe(object identifier, Action<object?> callback);
 
     /// <summary>
-    /// Returns whether or not there is anything listening to the specified identifier.
+    /// Returns whether there is anything listening to the specified identifier.
     /// </summary>
     bool IsSubscribed(object identifier);
 
     /// <summary>
-    /// Returns whether or not a callback action is listening for the specified identifier.
+    /// Returns whether a callback action is listening for the specified identifier.
     /// </summary>
     bool IsSubscribed(object identifier, Action<object?> callback);
 }
 
 /// <inheritdoc cref="ISignalBus"/>
-[AutoInject(ServiceLifetime.Scoped)]
 public class SignalBus : ISignalBus
 {
-    private readonly IDictionary<object, IList<Action<object?>>> _subscriptions = new Dictionary<object, IList<Action<object?>>>();
+    private readonly Dictionary<object, IList<Action<object?>>> _subscriptions = new();
 
     private bool _isExecuting;
     private readonly List<Action> _deferredActions = new();
@@ -88,7 +87,7 @@ public class SignalBus : ISignalBus
         _subscriptions[identifier].Add(callback);
     }
 
-    public void Trigger(object identifier) => Trigger<object>(identifier, null!);
+    public void Trigger(object identifier) => Trigger<object>(identifier, null);
 
     public void Trigger<TArgs>(object identifier, TArgs? args)
     {
@@ -148,10 +147,10 @@ public class SignalBus : ISignalBus
     private void UnsubscribeInternal(object identifier, Action<object?> callback)
     {
         if (!IsSubscribed(identifier, callback)) return;
-        var hashset = _subscriptions[identifier];
-        var subscription = hashset.SingleOrDefault(x => x == callback);
+        var callbacks = _subscriptions[identifier];
+        var subscription = callbacks.SingleOrDefault(x => x == callback);
         if (subscription == null) return;
-        hashset.Remove(subscription);
+        callbacks.Remove(subscription);
 
         if (!_subscriptions[identifier].Any())
             _subscriptions.Remove(identifier);
