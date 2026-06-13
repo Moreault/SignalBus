@@ -47,6 +47,40 @@ private void TheSomethingMethod(object? args)
 services.AddSignalBus();
 ```
 
+## Strongly-typed signals
+
+Every subscribe/unsubscribe method has a generic overload so you can work with the real argument type instead of casting from `object?` yourself. `Subscribe`, `SubscribeRetroactively`, `Unsubscribe` and `IsSubscribed` all accept an `Action<TArgs?>`.
+
+```c#
+public void SomeMethod()
+{
+	//The callback now receives a strongly-typed ActualArgumentType? - no casting required
+	_signalBus.Subscribe<ActualArgumentType>(Signal.Something, TheSomethingMethod);
+}
+
+public void SomeOtherMethod()
+{
+	//Triggering is unchanged
+	_signalBus.Trigger(Signal.Something, new ActualArgumentType { Name = "Henry", Level = 15, Job = Job.Warrior });
+}
+
+private void TheSomethingMethod(ActualArgumentType? args)
+{
+	//args is already the right type
+	...
+}
+```
+
+You unsubscribe (and query) with the same typed callback you subscribed with:
+
+```c#
+_signalBus.Unsubscribe<ActualArgumentType>(Signal.Something, TheSomethingMethod);
+
+if (_signalBus.IsSubscribed<ActualArgumentType>(Signal.Something, TheSomethingMethod)) { ... }
+```
+
+The typed and weak-typed (`Action<object?>`) overloads can be mixed freely on the same signal. A typed subscriber simply receives the triggered argument cast to its type. Note that this cast is strict: if a signal is triggered with arguments that aren't assignable to `TArgs`, the typed callback throws an `InvalidCastException`. A parameterless `Trigger` (or one triggered with `null`) is passed to the callback as `default`.
+
 ## Subscribing
 There are two ways to subscribe to events : `Subscribe` and `SubscribeRetroactively`.
 
