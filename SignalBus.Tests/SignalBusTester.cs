@@ -776,4 +776,220 @@ public class SignalBusTester : Tester<SignalBus>
         //Assert
         result.Should().BeFalse();
     }
+
+    [TestMethod]
+    public void TypedSubscribe_WhenCallbackNull_Throw()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        Action<Garbage?> callback = null!;
+
+        //Act
+        var action = () => Instance.Subscribe(identifier, callback);
+
+        //Assert
+        action.Should().Throw<ArgumentNullException>();
+    }
+
+    [TestMethod]
+    public void TypedSubscribe_WhenIdentifierNull_Throw()
+    {
+        //Arrange
+        object identifier = null!;
+        var callback = Dummy.Create<Action<Garbage?>>();
+
+        //Act
+        var action = () => Instance.Subscribe(identifier, callback);
+
+        //Assert
+        action.Should().Throw<ArgumentNullException>();
+    }
+
+    [TestMethod]
+    public void TypedSubscribe_WhenTriggeredWithMatchingArgs_InvokeWithTypedArgs()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        var args = Dummy.Create<Garbage>();
+
+        Garbage? received = null;
+        Instance.Subscribe<Garbage>(identifier, x => received = x);
+
+        //Act
+        Instance.Trigger(identifier, args);
+
+        //Assert
+        received.Should().Be(args);
+    }
+
+    [TestMethod]
+    public void TypedSubscribe_WhenTriggeredWithMismatchedArgs_Throw()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        Instance.Subscribe<Garbage>(identifier, _ => { });
+
+        //Act
+        var action = () => Instance.Trigger(identifier, Dummy.Create<string>());
+
+        //Assert
+        action.Should().Throw<InvalidCastException>();
+    }
+
+    [TestMethod]
+    public void TypedSubscribe_WhenTriggeredWithoutArgs_InvokeWithDefault()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+
+        var wasInvoked = false;
+        Garbage? received = Dummy.Create<Garbage>();
+        Instance.Subscribe<Garbage>(identifier, x =>
+        {
+            wasInvoked = true;
+            received = x;
+        });
+
+        //Act
+        Instance.Trigger(identifier);
+
+        //Assert
+        wasInvoked.Should().BeTrue();
+        received.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void TypedSubscribeRetroactively_WhenSignalTriggeredBeforeSubscribing_InvokeWithTypedArgs()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        var args = Dummy.Create<Garbage>();
+        Instance.Trigger(identifier, args);
+
+        Garbage? received = null;
+
+        //Act
+        Instance.SubscribeRetroactively<Garbage>(identifier, x => received = x);
+
+        //Assert
+        received.Should().Be(args);
+    }
+
+    [TestMethod]
+    public void TypedUnsubscribe_WhenSubscribed_Unsubscribe()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        var callback = Dummy.Create<Action<Garbage?>>();
+        Instance.Subscribe(identifier, callback);
+
+        //Act
+        Instance.Unsubscribe(identifier, callback);
+
+        //Assert
+        Instance.IsSubscribed(identifier, callback).Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void TypedUnsubscribe_WhenSubscribed_DoNotInvokeAfterwards()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        var invokeCount = 0;
+        Action<Garbage?> callback = _ => invokeCount++;
+        Instance.Subscribe(identifier, callback);
+
+        //Act
+        Instance.Unsubscribe(identifier, callback);
+
+        //Assert
+        Instance.Trigger(identifier, Dummy.Create<Garbage>());
+        invokeCount.Should().Be(0);
+    }
+
+    [TestMethod]
+    public void TypedIsSubscribed_WhenCallbackIsSubscribed_ReturnTrue()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        var callback = Dummy.Create<Action<Garbage?>>();
+        Instance.Subscribe(identifier, callback);
+
+        //Act
+        var result = Instance.IsSubscribed(identifier, callback);
+
+        //Assert
+        result.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void TypedIsSubscribed_WhenCallbackIsNotSubscribed_ReturnFalse()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        var callback = Dummy.Create<Action<Garbage?>>();
+
+        //Act
+        var result = Instance.IsSubscribed(identifier, callback);
+
+        //Assert
+        result.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void WhenCallbackThrows_BusRemainsUsable()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        Instance.Subscribe(identifier, _ => throw new Exception("boom"));
+
+        var act = () => Instance.Trigger(identifier);
+        act.Should().Throw<Exception>();
+
+        //Act
+        var subsequent = () => Instance.Subscribe(Dummy.Create<object>(), Dummy.Create<Action<object?>>());
+
+        //Assert
+        subsequent.Should().NotThrow();
+    }
+
+    [TestMethod]
+    public void ClearIdentifier_WhenSignalWasTriggered_DoNotReplayToLaterRetroactiveSubscriber()
+    {
+        //Arrange
+        var identifier = Dummy.Create<object>();
+        Instance.Trigger(identifier, Dummy.Create<Garbage>());
+        Instance.Clear(identifier);
+
+        var wasInvoked = false;
+
+        //Act
+        Instance.SubscribeRetroactively(identifier, _ => wasInvoked = true);
+
+        //Assert
+        wasInvoked.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void WhenAccessedConcurrently_DoNotCorruptOrThrow()
+    {
+        //Arrange
+        var identifiers = Dummy.CreateMany<object>(8).ToList();
+        var invokeCount = 0;
+
+        //Act
+        var action = () => Parallel.For(0, 1000, i =>
+        {
+            var identifier = identifiers[i % identifiers.Count];
+            Action<object?> callback = _ => Interlocked.Increment(ref invokeCount);
+
+            Instance.Subscribe(identifier, callback);
+            Instance.Trigger(identifier);
+            Instance.IsSubscribed(identifier);
+            Instance.Unsubscribe(identifier, callback);
+        });
+
+        //Assert
+        action.Should().NotThrow();
+    }
 }

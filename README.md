@@ -25,16 +25,16 @@ public void SomeMethod()
 	_signalBus.Subscribe(Signal.Something, TheSomethingMethod)
 }
 
-public SomeOtherMethod()
+public void SomeOtherMethod()
 {
 	//This will trigger every action that has subscribed to the Signal.Something identifier with this argument
 	_signalBus.Trigger(Signal.Something, new ActualArgumentType { Name = "Henry", Level = 15, Job = Job.Warrior });
 }
 
-//You do need an object-typed args parameter even if you don't use arguments... I haven't found a better way to deal with this yet unfortunately
-private void TheSomethingMethod(object args)
+//The callback signature requires an object? parameter even if you don't use arguments
+private void TheSomethingMethod(object? args)
 {
-	var arguments = (ActualArgumentType)args;
+	var arguments = (ActualArgumentType)args!;
 
 	...
 }
@@ -43,19 +43,43 @@ private void TheSomethingMethod(object args)
 
 ### Setup
 
-#### With AutoInject
-
-If you already use AutoInject or AssemblyInitializer then you're already good to go.
-
-See the AutoInject repo for more information on how to set it up.
-
-#### Without AutoInject
-
-Add the following line when adding services.
-
 ```c#
 services.AddSignalBus();
 ```
+
+## Strongly-typed signals
+
+Every subscribe/unsubscribe method has a generic overload so you can work with the real argument type instead of casting from `object?` yourself. `Subscribe`, `SubscribeRetroactively`, `Unsubscribe` and `IsSubscribed` all accept an `Action<TArgs?>`.
+
+```c#
+public void SomeMethod()
+{
+	//The callback now receives a strongly-typed ActualArgumentType? - no casting required
+	_signalBus.Subscribe<ActualArgumentType>(Signal.Something, TheSomethingMethod);
+}
+
+public void SomeOtherMethod()
+{
+	//Triggering is unchanged
+	_signalBus.Trigger(Signal.Something, new ActualArgumentType { Name = "Henry", Level = 15, Job = Job.Warrior });
+}
+
+private void TheSomethingMethod(ActualArgumentType? args)
+{
+	//args is already the right type
+	...
+}
+```
+
+You unsubscribe (and query) with the same typed callback you subscribed with:
+
+```c#
+_signalBus.Unsubscribe<ActualArgumentType>(Signal.Something, TheSomethingMethod);
+
+if (_signalBus.IsSubscribed<ActualArgumentType>(Signal.Something, TheSomethingMethod)) { ... }
+```
+
+The typed and weak-typed (`Action<object?>`) overloads can be mixed freely on the same signal. A typed subscriber simply receives the triggered argument cast to its type. Note that this cast is strict: if a signal is triggered with arguments that aren't assignable to `TArgs`, the typed callback throws an `InvalidCastException`. A parameterless `Trigger` (or one triggered with `null`) is passed to the callback as `default`.
 
 ## Subscribing
 There are two ways to subscribe to events : `Subscribe` and `SubscribeRetroactively`.
@@ -73,3 +97,11 @@ This way, the player doesn't have to subscribe to every single enemy's OnDeath e
 
 However, if you want to know when the player's collider comes into collision with an object then it may be a better idea for your player to subscribe to its collider's event directly instead of broadcasting the collision via the SignalBus.
 Unless other unrelated objects need to know about this of course.
+
+## Breaking changes
+
+### 4.0.0
+- Now targets .NET 10
+- `ToolBX.AutoInject` is no longer a dependency of this library
+- The `AutoInjectOptions` parameter has been removed from `AddSignalBus()`
+- `SignalBus` is now registered as a singleton (previously scoped via AutoInject)
