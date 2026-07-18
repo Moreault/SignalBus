@@ -104,3 +104,4 @@ Unless other unrelated objects need to know about this of course.
 - Now targets .NET 10
 - `ToolBX.AutoInject` is no longer a dependency of this library
 - The `AutoInjectOptions` parameter has been removed from `AddSignalBus()`
+- `SignalBus` is now registered as a singleton (previously scoped via AutoInject)
